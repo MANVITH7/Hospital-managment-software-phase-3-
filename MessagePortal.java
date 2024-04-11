@@ -1,5 +1,12 @@
 package HospitalPortal;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -12,12 +19,21 @@ import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.input.KeyCode;
 
-public class MessagePortal {
+public class MessagePortal extends Application{
+	public static void main(String[] args) {
+		launch (args);
+	}
+	
+	@Override
+	public void start(Stage primaryStage) {
+		primaryStage.setScene(openScene(primaryStage, new Scene(new VBox(), 200, 200), true, "25"));
+		primaryStage.show();
+	}
+	
 	String allMessages = "";
-	public Scene openScene(Scene previous, Stage primaryStage, boolean isDoctor, String id) {
+	public Scene openScene(Stage primaryStage, Scene previous, boolean isDoctor, String id) {
 		String sender;
-		Data data = new Data();
-		String[] oldMessages = data.readFile(id + "Messages.txt");
+		String[] oldMessages = readFile(id + "Messages.txt");
 		
 		for (int i = 0; i < oldMessages.length; i++) {
 			allMessages += oldMessages[i] + "\n";
@@ -53,7 +69,7 @@ public class MessagePortal {
                 messages.setText(allMessages);
                 sendMessage.clear();
                 String[] fullString = allMessages.split("\n");
-                data.writeFile(id + "Messages.txt", fullString);
+                writeFile(id + "Messages.txt", fullString);
             }
         });
 		
@@ -65,7 +81,7 @@ public class MessagePortal {
 				messages.setText(allMessages);
 				sendMessage.clear(); 
 				String[] fullString = allMessages.split("\n");
-                data.writeFile(id + "Messages.txt", fullString);
+                writeFile(id + "Messages.txt", fullString);
 			}
 		});
 		
@@ -96,5 +112,63 @@ public class MessagePortal {
 		total.setStyle("-fx-background-color: #006E8C;");
 		
 		return new Scene(total, 650, 400);
+	
 	}
+	
+	// reads from a file
+    public String[] readFile(String fileName) {
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+        	int n = br.read();
+        	String[] contents = new String[n];
+        	br.readLine();
+            for (int i = 0; i < contents.length; i++) {
+            	contents[i] = br.readLine();
+            }
+            return contents;
+        } 
+        catch (IOException e) {
+            return new String[0];
+        }
+    }
+    
+    // writes to a file
+    public void writeFile(String fileName, String[] contents) {
+    	try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
+    		bw.write(contents.length);
+    		bw.newLine();
+    		for (int i = 0; i < contents.length; i++) {
+    			bw.write(contents[i]);
+    			bw.newLine();
+    		}
+        } 
+    	catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    // gets a new id# for a new patient
+    public String newID() {
+    	String ID = "";
+    	try (BufferedReader br = new BufferedReader(new FileReader("LastID.txt"))) {
+    		int n = br.read();
+    		n++;
+    		ID += String.format("%05d", n);
+    		try(BufferedWriter bw = new BufferedWriter(new FileWriter("LastID.txt"))) {
+    			bw.write(n);
+    		}
+    		catch (IOException e) {
+    			e.printStackTrace();
+    		}
+    	}
+    	catch (IOException e) {
+    		try(BufferedWriter bw = new BufferedWriter(new FileWriter("LastID.txt"))) {
+    			bw.write(1);
+    			ID = "00001";
+    		}
+    		catch (IOException r) {
+    			r.printStackTrace();
+    		}
+    	}
+    	return ID;
+    }
 }
