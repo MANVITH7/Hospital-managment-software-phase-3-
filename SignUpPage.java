@@ -98,8 +98,18 @@ public class SignUpPage extends Application {
                 showPopup("Invalid input detected.", window);
             }
         });
+        
+        Hyperlink loginLink = new Hyperlink("Have an account? Click here to login.");
+        loginLink.setOnAction(e -> {
+            loginpage loginPage = new loginpage();
+            try {
+                loginPage.start(window); 
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
 
-        mainContainer.getChildren().addAll(heading, logo, formLayout);
+        mainContainer.getChildren().addAll(heading, logo, formLayout,loginLink);
 
         Scene scene = new Scene(mainContainer, 420, 520);
 
