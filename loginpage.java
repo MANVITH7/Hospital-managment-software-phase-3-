@@ -47,8 +47,8 @@ public class loginpage extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("Login");
+    public void start(Stage window) {
+        window.setTitle("Login");
 
         Text header = new Text("Login to your account");
         header.setFont(Font.font("Arial", FontWeight.BOLD, 20));
@@ -71,24 +71,39 @@ public class loginpage extends Application {
         loginButton.setStyle("-fx-background-color: #4C7A34;");
         loginButton.setOnAction(event -> {
             if (findLogin(patientIdField.getText(), passwordField.getText())) {
-                errorMessage.setText("Correct username and password");
+            	try {
+            		PatientView patPage = new PatientView();
+                    patPage.start(window); 
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             } else {
                 errorMessage.setText("Username/Password is entered incorrectly");
             }
         });
 
-        Hyperlink signupLink = new Hyperlink("Don't have an account? Signup here.");
-        signupLink.setOnAction(event -> {
-            errorMessage.setText("Navigating to signup page");
-            // Here you would navigate to the signup page
-        });
+        
 
         VBox layout = new VBox(10);
+        Hyperlink signupLink = new Hyperlink("Don't have an account? Signup here.");
+        signupLink.setOnAction(event -> {
+            SignUpPage signUpPage = new SignUpPage();
+            try {
+                signUpPage.start(window);  // Navigate to the signup page
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        
         layout.setAlignment(Pos.CENTER);
         layout.getChildren().addAll(header, errorMessage, patientIdField, passwordField, loginButton, signupLink);
         layout.setStyle("-fx-background-color: #006E8C;");
+        
+       
+        
+        
 
-        primaryStage.setScene(new Scene(layout, 400, 300));
-        primaryStage.show();
+        window.setScene(new Scene(layout, 400, 300));
+        window.show();
     }
 }
